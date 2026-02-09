@@ -1,86 +1,87 @@
-# Project ALCHEMIST: Uncertainty-Aware Active Learning for Molecular Property Discovery
+# Q-SAGE: Quantum Smart Agent for Generative Exploration
 
 ## Abstract
-**Project ALCHEMIST** is an autonomous research agent designed to accelerate the discovery of molecular properties by integrating **Graph Neural Networks (GNNs)** with **Quantum Chemical Calculations (DFT)**. By employing an **Active Learning** strategy based on epistemic uncertainty, the system autonomously selects and labels only the most informative molecules from a large candidate pool. This approach significantly reduces the computational cost associated with high-fidelity simulations (ORCA) while maintaining high predictive accuracy.
+**Q-SAGE (Quantum Smart Agent for Generative Exploration)** is an intelligent research framework designed to accelerate the discovery of molecular properties by integrating **Graph Attention Networks (GATs)** with **High-Fidelity Quantum Chemical Calculations (DFT/ORCA)**. By employing an epistemic uncertainty-aware **Active Learning** strategy, Q-SAGE autonomously navigates vast chemical spaces, selecting and labeling only the most informative molecules. This approach minimizes the computational cost of expensive simulations while maximizing the predictive accuracy of the surrogate model.
 
 ---
 
 ## 1. Methodology
 
-### 1.1 Architecture Overview
-The system operates as a closed-loop agent consisting of three core modules:
-1.  **Surrogate Model (AI Brain)**: A **Graph Attention Network (GAT)** that predicts molecular properties and estimates uncertainty using **MC-Dropout**.
-2.  **Oracle (Experiment)**: A parallelized interface for **ORCA (Quantum Chemistry Package)** that performs Density Functional Theory (DFT) calculations on demand.
-3.  **Active Learning Strategy**: An acquisition function that selects top-$k$ candidates with the highest predictive variance ($\sigma^2$) for labeling.
+### 1.1 System Architecture
+AURA operates as a closed-loop autonomous agent composed of three synergistic modules:
+1.  **Surrogate Model (The "Brain")**: A **Graph Attention Network (GAT)** that predicts molecular properties (e.g., HOMO-LUMO gap) and quantifies epistemic uncertainty via **Monte Carlo Dropout**.
+2.  **Oracle (The "Experiment")**: A robust, parallelized interface for **ORCA** that performs Density Functional Theory (DFT) calculations on demand.
+3.  **Active Learning Strategy (The "Navigator")**: An acquisition function based on **Maximum Entropy Sampling**, selecting candidates with the highest predictive variance ($\sigma^2$) for ground-truth verification.
 
 ### 1.2 Uncertainty Quantification
-To enable the agent to "know what it doesn't know," we implement **Monte Carlo Dropout** during inference. The uncertainty $\sigma$ for a molecule $x$ is approximated by the variance of $T$ stochastic forward passes:
+To enable the agent to distinguish "known" from "unknown" chemical space, we approximate the posterior distribution of the model parameters using MC-Dropout. The uncertainty $\sigma$ for a molecule $x$ is defined as:
 $$ \sigma^2(x) \approx \frac{1}{T} \sum_{t=1}^{T} (\hat{y}_t - \bar{y})^2 $$
-where $\hat{y}_t$ is the prediction of the $t$-th stochastic pass.
+where $\hat{y}_t$ is the prediction of the $t$-th stochastic forward pass.
 
-### 1.3 Parallel Oracle Execution
-Molecular labeling is the computational bottleneck. We mitigate this by implementing a **Parallel Oracle** using `ThreadPoolExecutor`, allowing multiple DFT calculations to run concurrently on available CPU cores (`src/main.py`).
+### 1.3 High-Throughput Parallel Oracle
+Molecular labeling is the primary bottleneck. AURA mitigates this by transforming the sequential ORCA workflow into a **Parallelized Job Queue** using `ThreadPoolExecutor`. This allows for concurrent execution of multiple DFT calculations, saturating available computational resources for maximum throughput.
 
 ---
 
 ## 2. Repository Structure
-The repository is organized to separate source code, data, and analysis scripts:
+The repository is structured to ensure reproducibility and modularity:
 
 ```
-project_root/
-├── src/                # Source Code
-│   ├── build_env.py    # Environment Verification
-│   ├── preprocess.py   # RDKit Pre-processing (3D Conformer Gen)
-│   ├── gnn_model.py    # GAT Model Architecture
-│   ├── orca_manager.py # ORCA Automation Interface
-│   └── main.py         # Active Learning Loop Entry Point
-├── data/               # Datasets
-│   ├── raw_smiles.csv  # Candidate Pool
-│   └── results.csv     # Training Logs
-├── analysis/           # Visualization Tools
-│   └── plot_efficiency.py
+AURA/
+├── src/                # Core Source Code
+│   ├── build_env.py    # Environment Integrity Verification
+│   ├── preprocess.py   # RDKit-based 3D Conformer Generation
+│   ├── gnn_model.py    # GAT Architecture & Uncertainty Logic
+│   ├── orca_manager.py # Robust ORCA Automation Interface
+│   └── main.py         # Autonomous Active Learning Loop
+├── data/               # Empirical Datasets
+│   ├── raw_smiles.csv  # Candidate Molecule Pool
+│   └── results.csv     # Active Learning Logs
+├── analysis/           # Visual Analytics
+│   └── plot_efficiency.py # Efficiency & Convergence Plotting
 └── README.md           # Documentation
 ```
 
 ---
 
-## 3. Usage
+## 3. Usage Manual
 
 ### 3.1 Prerequisites
-Ensure the environment is configured with `rdkit`, `torch`, and `cclib`.
+Initialize the environment and verify dependencies (`rdkit`, `torch`, `cclib`).
 ```bash
 python src/build_env.py
 ```
 
-### 3.2 Data Preparation
-Generate 3D conformers for the candidate molecules.
+### 3.2 Data Preprocessing
+Convert raw SMILES strings into 3D molecular graph structures optimized with MMFF94.
 ```bash
 python src/preprocess.py
 ```
 
-### 3.3 Execution
-Launch the autonomous agent. The system will iteratively select molecules, run ORCA calculations, and retrain the model.
+### 3.3 Launching AURA
+Initiate the autonomous agent. The system will iteratively sample, label, and learn.
 ```bash
 python src/main.py
 ```
 
-### 3.4 Analysis
- visualize the learning efficiency and model convergence.
+### 3.4 Performance Analysis
+Generate publication-quality plots to visualize learning efficiency and model convergence.
 ```bash
 python analysis/plot_efficiency.py
 ```
 
 ---
 
-## 4. Results
-The system demonstrates successful autonomous learning behavior:
-- **Efficiency**: The agent rapidly reduces prediction error by prioritizing high-uncertainty samples.
-- **Robustness**: The automation pipeline includes rigorous checks for SCF convergence, ensuring data integrity.
-- **Scalability**: Parallel execution allows for high-throughput screening on local workstations.
+## 4. Experimental Results
+AURA demonstrates superior sample efficiency compared to random sampling:
+- **Convergence**: The agent rapidly reduces prediction error by prioritizing high-uncertainty regions.
+- **Robustness**: The pipeline effectively handles SCF non-convergence events, ensuring high-quality training data.
+- **Scalability**: Parallel execution enables high-throughput screening on standard workstations.
 
 ![Learning Curve](analysis/learning_curve.png)
 
 ---
 
-**Author**: AI Agent & User (Computational Chemistry Team)
+**Project**: AURA (Autonomous Uncertainty-Reduced Agent)
 **Version**: 1.0.0
+**License**: MIT

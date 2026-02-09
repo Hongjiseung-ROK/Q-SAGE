@@ -19,5 +19,4 @@ orca_bin/
 *.property.txt
 
 # Artifacts
-analysis/*.png
 data/results.csv
