@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+
+# ORCA
+data/orca_work/
+orca_bin/
+*.inp
+*.out
+*.gbw
+*.xyz
+*.opt
+*.txt
+*.tmp
+*.engrad
+*.densities
+*.densitiesinfo
+*.prop
+*.property.txt
+
+# Artifacts
+analysis/*.png
+data/results.csv
